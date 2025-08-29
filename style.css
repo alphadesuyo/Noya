@@ -35,21 +35,24 @@ button:hover { background: #1565c0; }
 #dashboard-modal { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 #dashboard-modal > div { background: #fff; padding: 32px; border-radius: 12px; min-width: 320px; max-width: 90vw; max-height: 80vh; overflow: auto; }
 
+/* --- スマホ用レスポンシブ (幅600px以下) --- */
 @media screen and (max-width: 600px) {
   body {
     padding: 10px;
-    font-size: 14px;
+    font-size: 15px;
   }
 
+  /* ヘッダー */
   .header {
     flex-direction: column;
     align-items: flex-start;
-    padding: 10px;
+    padding: 12px;
   }
 
   .logo {
-    font-size: 20px;
-    margin-bottom: 8px;
+    font-size: 24px;  /* PCより大きめで目立たせる */
+    font-weight: bold;
+    margin-bottom: 10px;
   }
 
   .search-wrap {
@@ -60,33 +63,50 @@ button:hover { background: #1565c0; }
 
   .search-wrap input {
     flex: 1;
-    font-size: 14px;
-    padding: 6px;
+    font-size: 16px;
+    padding: 8px;
   }
 
   .account-wrap {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    margin-top: 8px;
+    margin-top: 10px;
+    font-size: 16px;
   }
 
-  form input, form button {
-    width: 100%;
-    margin: 6px 0;
+  .account-wrap button {
     font-size: 16px;
-    padding: 10px;
+    padding: 8px 12px;
+  }
+
+  /* 登録・ログインフォーム */
+  #login-form, #register-form {
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  #login-form input, #register-form input {
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+    font-size: 16px;
     box-sizing: border-box;
   }
 
-  button {
+  #login-form button, #register-form button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
     font-size: 16px;
-    padding: 10px;
+    box-sizing: border-box;
   }
 
+  /* ギャラリー */
   .gallery-list {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2列表示 */
+    grid-template-columns: 1fr 1fr; /* スマホは2列表示 */
     gap: 8px;
   }
 
