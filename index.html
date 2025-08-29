@@ -31,25 +31,18 @@
         <hr>
         <h3>新規登録</h3>
         <form id="register-form">
-            <input type="text" id="reg-username" placeholder="ユーザー名" required><br>
-            <input type="password" id="reg-password" placeholder="パスワード" required><br>
+          <input type="text" id="reg-username" placeholder="ユーザー名" required><br>
+          <input type="password" id="reg-password" placeholder="パスワード" required><br>
+  
+          <div>
+            <a href="/static/terms.html" target="_blank">利用規約を読む</a>
+          </div>
+          <label>
+            <input type="checkbox" id="agree-terms" required>
+            利用規約に同意します
+          </label><br>
 
-            <div style="margin:10px 0; max-height:150px; overflow:auto; border:1px solid #ccc; padding:8px; font-size:0.9rem; background:#fafafa;">
-                <h4>利用規約</h4>
-                <p>・違法アップロードや著作権侵害は禁止です。<br>
-                ・アダルト・児童ポルノ・わいせつコンテンツは禁止です。<br>
-                ・管理者はファイルを削除できるものとします。<br>
-                ・アップロードされたファイルは30日後に自動削除されます。<br>
-                ・ファイルの破損・漏洩に関して管理者は責任を負いません。<br>
-                ・違反行為が確認された場合、アカウントはBANされます。</p>
-            </div>
-
-            <label>
-                <input type="checkbox" id="agree-terms" required>
-                利用規約に同意します
-            </label><br>
-
-            <button type="submit">登録</button>
+          <button type="submit">登録</button>
         </form>
 
         <div id="register-msg" class="error"></div>

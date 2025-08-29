@@ -6,6 +6,14 @@ function apiFetch(path, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+
+    if (localStorage.getItem('agreedTerms') === 'true') {
+        const agreeBox = document.getElementById('agree-terms');
+        if (agreeBox) {
+          agreeBox.checked = true;
+        }
+      }
+
     // UI要素取得
     const loginArea = document.getElementById('login-area');
     const mainArea = document.getElementById('main-area');
