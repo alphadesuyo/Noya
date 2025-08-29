@@ -285,14 +285,52 @@ document.addEventListener('DOMContentLoaded', function() {
     // プレビュー
     function previewFile(f) {
         const ext = f.filename.split('.').pop().toLowerCase();
+        let modalCheckTimer = null;
+        function startCheckDeleted() {
+            // 1秒ごとにファイル存在チェック
+            modalCheckTimer = setInterval(() => {
+                apiFetch('/view/' + encodeURIComponent(f.filename)).then(r => r.json()).then(data => {
+                    if (!data.success) {
+                        // モーダルを閉じて警告
+                        const modal = document.getElementById('preview-modal');
+                        if (modal) modal.remove();
+                        alert('このファイルは削除されました');
+                        clearInterval(modalCheckTimer);
+                    }
+                });
+            }, 1000);
+        }
+        function stopCheckDeleted() {
+            if (modalCheckTimer) clearInterval(modalCheckTimer);
+        }
+        // モーダルを開く
+        let html = '';
         if (["jpg","jpeg","png","gif","bmp","webp"].includes(ext)) {
-            showModal(`<img src='${API_BASE}/view/${encodeURIComponent(f.filename)}' style='max-width:90vw;max-height:70vh;'>`);
+            html = `<img src='${API_BASE}/view/${encodeURIComponent(f.filename)}' style='max-width:90vw;max-height:70vh;'>`;
         } else if (["mp4","webm","mov","avi"].includes(ext)) {
-            showModal(`<video src='${API_BASE}/view/${encodeURIComponent(f.filename)}' controls style='max-width:90vw;max-height:70vh;'></video>`);
+            html = `<video src='${API_BASE}/view/${encodeURIComponent(f.filename)}' controls style='max-width:90vw;max-height:70vh;'></video>`;
+        }
+        if (html) {
+            showModal(html);
+            startCheckDeleted();
+            // モーダル閉じたら監視停止
+            setTimeout(() => {
+                const modal = document.getElementById('preview-modal');
+                if (modal) {
+                    modal.addEventListener('click', stopCheckDeleted);
+                }
+            }, 100);
         } else {
             apiFetch('/view/' + encodeURIComponent(f.filename)).then(r => r.json()).then(data => {
                 if (data.success && data.type === 'text') {
                     showModal(`<pre style='max-width:90vw;max-height:70vh;overflow:auto;'>${escapeHtml(data.content)}</pre>`);
+                    startCheckDeleted();
+                    setTimeout(() => {
+                        const modal = document.getElementById('preview-modal');
+                        if (modal) {
+                            modal.addEventListener('click', stopCheckDeleted);
+                        }
+                    }, 100);
                 } else {
                     showModal(data.error || 'プレビューできません');
                 }
