@@ -262,25 +262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem(key, JSON.stringify(arr));
     }
 
-    // ダッシュボード
-    dashboardBtn.onclick = function() {
-        let html = `<h2>ダッシュボード</h2>`;
-        html += `<h3>自分のアップロード</h3><ul>`;
-        myUploads.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul><h3>閲覧履歴</h3><ul>`;
-        viewHistory.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul><h3>ダウンロード履歴</h3><ul>`;
-        dlHistory.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul><button onclick='document.getElementById("dashboard-modal").style.display="none"'>閉じる</button>`;
-        dashboardModal.innerHTML = `<div>${html}</div>`;
-        dashboardModal.style.display = '';
-    };
+    // dashboardBtnは現状UIに存在しないため、関連コードを完全削除
 
     // アカウントアイコンでモーダル表示
     if (accountIcon) {
@@ -397,11 +379,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 registerMsg.style.color = 'red';
                 registerMsg.textContent = '登録失敗';
             });
-            return false;
+            // return false; // 不要なので削除
         };
     }
 
-    checkLogin();
     // --- 自動ログイン判定（ページロード時） ---
     checkLogin();
 });
