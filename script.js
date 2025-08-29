@@ -244,7 +244,15 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 thumb = `<div class='gallery-thumb' style='display:flex;align-items:center;justify-content:center;font-size:2rem;color:#888;'>?</div>`;
             }
-            let btns = `<button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button>`;
+            let btns = `
+                <button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">
+                    DL
+                </button>
+                <span style="margin-left:8px; font-size:0.9rem; color:#555;">
+                    DL数: ${f.download_count}
+                </span>
+                <button data-fn="${encodeURIComponent(f.filename)}" data-act="report" style="background:#ff9800;">通報</button>
+            `;
             if (isAdmin) {
                 btns += ` <button data-fn="${encodeURIComponent(f.filename)}" data-act="del" style="background:#e53935;">削除</button>`;
             }
@@ -260,6 +268,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.open(API_BASE + '/download/' + encodeURIComponent(f.filename), '_blank');
                 addHistory('dl', f);
             };
+            // 通報ボタン
+            const reportBtn = item.querySelector('button[data-act="report"]');
+            if (reportBtn) {
+                reportBtn.onclick = function() {
+                    if (confirm('このファイルを通報しますか？')) {
+                        apiFetch('/report/' + encodeURIComponent(f.filename), { method: 'POST' })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('通報しました');
+                                } else {
+                                    alert(data.error || '通報失敗');
+                                }
+                            });
+                    }
+                };
+            }
             // サムネイルクリックでプレビュー
             item.querySelector('.gallery-thumb').onclick = function() {
                 previewFile(f);
