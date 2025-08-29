@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Noyaファイル共有</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <header class="header">
         <div class="logo">Noya</div>
         <div class="search-wrap">
             <input type="text" id="search-input" placeholder="タイトル検索">
+            <button id="search-btn" title="検索" style="margin-left:4px;padding:7px 10px;background:#fff;border:1px solid #ccc;border-radius:4px;cursor:pointer;vertical-align:middle;">
+                <svg width="20" height="20" viewBox="0 0 20 20"><circle cx="9" cy="9" r="7" stroke="#1976d2" stroke-width="2" fill="none"/><line x1="15" y1="15" x2="19" y2="19" stroke="#1976d2" stroke-width="2"/></svg>
+            </button>
         </div>
         <div class="account-wrap" id="account-wrap">
             <span id="account-name"></span>
@@ -30,8 +33,25 @@
         <form id="register-form">
             <input type="text" id="reg-username" placeholder="ユーザー名" required><br>
             <input type="password" id="reg-password" placeholder="パスワード" required><br>
+
+            <div style="margin:10px 0; max-height:150px; overflow:auto; border:1px solid #ccc; padding:8px; font-size:0.9rem; background:#fafafa;">
+                <h4>利用規約</h4>
+                <p>・違法アップロードや著作権侵害は禁止です。<br>
+                ・アダルト・児童ポルノ・わいせつコンテンツは禁止です。<br>
+                ・管理者はファイルを削除できるものとします。<br>
+                ・アップロードされたファイルは30日後に自動削除されます。<br>
+                ・ファイルの破損・漏洩に関して管理者は責任を負いません。<br>
+                ・違反行為が確認された場合、アカウントはBANされます。</p>
+            </div>
+
+            <label>
+                <input type="checkbox" id="agree-terms" required>
+                利用規約に同意します
+            </label><br>
+
             <button type="submit">登録</button>
         </form>
+
         <div id="register-msg" class="error"></div>
     </div>
     <div id="main-area" style="display:none;">
@@ -41,7 +61,6 @@
         </section>
     </div>
     <div id="account-modal" style="display:none;"></div>
-    <script src="script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
-

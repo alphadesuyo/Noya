@@ -481,6 +481,12 @@ document.addEventListener('DOMContentLoaded', function() {
             registerMsg.textContent = '';
             const username = document.getElementById('reg-username').value;
             const password = document.getElementById('reg-password').value;
+            const agree = document.getElementById('agree-terms').checked;
+            if (!agree) {
+            registerMsg.style.color = 'red';
+            registerMsg.textContent = '利用規約に同意してください';
+            return;
+        }
             apiFetch('/register', {
                 method: 'POST',
                 body: new URLSearchParams({username, password})
