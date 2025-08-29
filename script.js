@@ -72,7 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             myUploads.forEach(f => {
                                 html += `<li>${escapeHtml(f.title)}</li>`;
                             });
-                            html += `</ul><h3>閲覧履歴</h3><ul>`;
+                            html += `</ul>`;
+                            if (isAdmin) {
+                                html += `<h3>全ファイル管理（管理者）</h3><ul id='admin-file-list'>`;
+                                allFiles.forEach(f => {
+                                    html += `<li>${escapeHtml(f.title)} <button class='admin-del-btn' data-fn='${encodeURIComponent(f.filename)}'>削除</button></li>`;
+                                });
+                                html += `</ul>`;
+                            }
+                            html += `<h3>閲覧履歴</h3><ul>`;
                             viewHistory.forEach(f => {
                                 html += `<li>${escapeHtml(f.title)}</li>`;
                             });
@@ -86,6 +94,29 @@ document.addEventListener('DOMContentLoaded', function() {
                             html += `</div>`;
                             accountModal.innerHTML = html;
                             accountModal.style.display = '';
+
+                            // 管理者削除ボタンのイベント
+                            if (isAdmin) {
+                                const adminDelBtns = accountModal.querySelectorAll('.admin-del-btn');
+                                adminDelBtns.forEach(btn => {
+                                    btn.onclick = function() {
+                                        const fn = decodeURIComponent(btn.getAttribute('data-fn'));
+                                        if (confirm('本当に削除しますか？')) {
+                                            apiFetch('/delete/' + encodeURIComponent(fn), {method: 'POST'})
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        loadFiles();
+                                                        // モーダルを再表示してリスト更新
+                                                        accountIcon.click();
+                                                    } else {
+                                                        alert(data.error || '削除失敗');
+                                                    }
+                                                });
+                                        }
+                                    };
+                                });
+                            }
 
                             // モーダル内アップロードフォームの動作
                             const uploadFormModal = document.getElementById('upload-form-modal');
