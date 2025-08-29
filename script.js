@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     loginArea.style.display = 'none';
                     mainArea.style.display = '';
                     loadFiles();
-                    loadMyUploads();
                 });
             } else {
                 loginArea.style.display = '';
@@ -91,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 uploadMsg.textContent = 'アップロード成功';
                 uploadForm.reset();
                 loadFiles();
-                loadMyUploads();
             } else {
                 uploadMsg.textContent = data.error || 'アップロード失敗';
             }
@@ -103,14 +101,11 @@ document.addEventListener('DOMContentLoaded', function() {
         apiFetch('/files').then(res => res.json()).then(data => {
             if (data.success) {
                 allFiles = data.files;
+                // myUploadsもここで更新
+                myUploads = allFiles.filter(f => f.uploader === currentUser);
                 renderGallery(allFiles);
             }
         });
-    }
-
-    // 自分のアップロード履歴取得（タイトル名でフィルタ）
-    function loadMyUploads() {
-        myUploads = allFiles.filter(f => f.uploader === currentUser);
     }
 
     // ギャラリー表示
