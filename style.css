@@ -1,10 +1,25 @@
-body { font-family: sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
-#login-area, #main-area { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+body { font-family: 'Segoe UI', sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+.header { display: flex; align-items: center; justify-content: space-between; background: #1976d2; color: #fff; padding: 12px 32px; }
+.logo { font-size: 2rem; font-weight: bold; letter-spacing: 2px; }
+.search-wrap { flex: 1; display: flex; justify-content: center; }
+#search-input { width: 320px; padding: 8px; border-radius: 4px; border: none; font-size: 1rem; }
+.account-wrap { display: flex; align-items: center; gap: 12px; }
+#account-name { font-weight: bold; }
+
+#login-area, #main-area { max-width: 900px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
 h2 { margin-top: 0; }
 input[type="text"], input[type="password"], input[type="file"] { width: 100%; margin-bottom: 12px; padding: 8px; }
 button { padding: 8px 16px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
 button:hover { background: #1565c0; }
 .error { color: red; margin-top: 8px; }
-#file-list { width: 100%; border-collapse: collapse; margin-top: 16px; }
-#file-list th, #file-list td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-#file-list th { background: #e3e3e3; }
+
+.gallery-section { margin-top: 32px; }
+.gallery-list { display: flex; flex-wrap: wrap; gap: 24px; justify-content: flex-start; }
+.gallery-item { background: #fafafa; border-radius: 8px; box-shadow: 0 1px 4px #bbb2; width: 180px; display: flex; flex-direction: column; align-items: center; padding: 12px 8px 16px 8px; margin-bottom: 12px; }
+.gallery-thumb { width: 160px; height: 120px; object-fit: cover; border-radius: 6px; background: #e3e3e3; margin-bottom: 8px; }
+.gallery-title { font-size: 1rem; font-weight: bold; margin-bottom: 8px; text-align: center; }
+.gallery-btns { display: flex; gap: 8px; }
+.gallery-item video { width: 160px; height: 120px; border-radius: 6px; background: #e3e3e3; }
+
+#dashboard-modal { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+#dashboard-modal > div { background: #fff; padding: 32px; border-radius: 12px; min-width: 320px; max-width: 90vw; max-height: 80vh; overflow: auto; }

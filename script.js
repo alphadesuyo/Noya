@@ -8,231 +8,262 @@ function apiFetch(path, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-	const loginArea = document.getElementById('login-area');
-	const mainArea = document.getElementById('main-area');
-	const loginForm = document.getElementById('login-form');
-	const loginError = document.getElementById('login-error');
-	const logoutBtn = document.getElementById('logout-btn');
-	const uploadForm = document.getElementById('upload-form');
-	const uploadMsg = document.getElementById('upload-msg');
-	const fileList = document.getElementById('file-list').getElementsByTagName('tbody')[0];
-	const searchInput = document.createElement('input');
-	searchInput.type = 'text';
-	searchInput.placeholder = 'タイトル検索';
-	searchInput.style.margin = '8px 0';
-	mainArea.insertBefore(searchInput, fileList.parentElement);
+    // UI要素取得
+    const loginArea = document.getElementById('login-area');
+    const mainArea = document.getElementById('main-area');
+    const loginForm = document.getElementById('login-form');
+    const loginError = document.getElementById('login-error');
+    const logoutBtn = document.getElementById('logout-btn');
+    const uploadForm = document.getElementById('upload-form');
+    const uploadMsg = document.getElementById('upload-msg');
+    const galleryList = document.getElementById('gallery-list');
+    const searchInput = document.getElementById('search-input');
+    const accountName = document.getElementById('account-name');
+    const dashboardBtn = document.getElementById('dashboard-btn');
+    const dashboardModal = document.getElementById('dashboard-modal');
 
-	let isAdmin = false;
+    let isAdmin = false;
+    let currentUser = null;
+    let allFiles = [];
+    let myUploads = [];
+    let viewHistory = JSON.parse(localStorage.getItem('viewHistory') || '[]');
+    let dlHistory = JSON.parse(localStorage.getItem('dlHistory') || '[]');
 
-	// ログイン状態確認
-	function checkLogin() {
-		apiFetch('/files').then(res => res.json()).then(data => {
-			if (data.success) {
-				// 管理者判定
-				apiFetch('/whoami').then(r => r.json()).then(u => {
-					isAdmin = u.user === 'admin';
-					loginArea.style.display = 'none';
-					mainArea.style.display = '';
-					loadFiles();
-				});
-			} else {
-				loginArea.style.display = '';
-				mainArea.style.display = 'none';
-			}
-		});
-	}
+    // ログイン状態確認
+    function checkLogin() {
+        apiFetch('/files').then(res => res.json()).then(data => {
+            if (data.success) {
+                // 管理者判定
+                apiFetch('/whoami').then(r => r.json()).then(u => {
+                    isAdmin = u.user === 'admin';
+                    currentUser = u.user;
+                    accountName.textContent = currentUser;
+                    loginArea.style.display = 'none';
+                    mainArea.style.display = '';
+                    loadFiles();
+                    loadMyUploads();
+                });
+            } else {
+                loginArea.style.display = '';
+                mainArea.style.display = 'none';
+            }
+        });
+    }
 
-	// ログイン
-	loginForm.onsubmit = function(e) {
-		e.preventDefault();
-		loginError.textContent = '';
-		apiFetch('/login', {
-			method: 'POST',
-			body: new URLSearchParams({
-				username: document.getElementById('username').value,
-				password: document.getElementById('password').value
-			})
-		}).then(res => res.json()).then(data => {
-			if (data.success) {
-				checkLogin();
-			} else {
-				loginError.textContent = data.error || 'ログイン失敗';
-			}
-		});
-	};
+    // ログイン
+    loginForm.onsubmit = function(e) {
+        e.preventDefault();
+        loginError.textContent = '';
+        apiFetch('/login', {
+            method: 'POST',
+            body: new URLSearchParams({
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            })
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                checkLogin();
+            } else {
+                loginError.textContent = data.error || 'ログイン失敗';
+            }
+        });
+    };
 
-	// ログアウト
-	logoutBtn.onclick = function() {
-		apiFetch('/logout', {method: 'POST'}).then(() => {
-			checkLogin();
-		});
-	};
+    // ログアウト
+    logoutBtn.onclick = function() {
+        apiFetch('/logout', {method: 'POST'}).then(() => {
+            checkLogin();
+        });
+    };
 
-	// アップロード
-	uploadForm.onsubmit = function(e) {
-		e.preventDefault();
-		uploadMsg.textContent = '';
-		const formData = new FormData();
-		formData.append('title', document.getElementById('title').value);
-		formData.append('file', document.getElementById('file').files[0]);
-		apiFetch('/upload', {
-			method: 'POST',
-			body: formData
-		}).then(res => res.json()).then(data => {
-			if (data.success) {
-				uploadMsg.textContent = 'アップロード成功';
-				uploadForm.reset();
-				loadFiles();
-			} else {
-				uploadMsg.textContent = data.error || 'アップロード失敗';
-			}
-		});
-	};
+    // アップロード
+    uploadForm.onsubmit = function(e) {
+        e.preventDefault();
+        uploadMsg.textContent = '';
+        const formData = new FormData();
+        formData.append('title', document.getElementById('title').value);
+        formData.append('file', document.getElementById('file').files[0]);
+        apiFetch('/upload', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json()).then(data => {
+            if (data.success) {
+                uploadMsg.textContent = 'アップロード成功';
+                uploadForm.reset();
+                loadFiles();
+                loadMyUploads();
+            } else {
+                uploadMsg.textContent = data.error || 'アップロード失敗';
+            }
+        });
+    };
 
-	// ファイル一覧取得
-	let allFiles = [];
-	function loadFiles() {
-		apiFetch('/files').then(res => res.json()).then(data => {
-			if (data.success) {
-				allFiles = data.files;
-				renderFiles(allFiles);
-			}
-		});
-	}
+    // ファイル一覧取得
+    function loadFiles() {
+        apiFetch('/files').then(res => res.json()).then(data => {
+            if (data.success) {
+                allFiles = data.files;
+                renderGallery(allFiles);
+            }
+        });
+    }
 
-	// ファイル一覧表示
-	function renderFiles(files) {
-		fileList.innerHTML = '';
-		files.forEach(f => {
-			const tr = document.createElement('tr');
-			let btns = `<button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button> `;
-			btns += `<button data-fn="${encodeURIComponent(f.filename)}" data-act="preview">プレビュー</button>`;
-			if (isAdmin) {
-				btns += ` <button data-fn="${encodeURIComponent(f.filename)}" data-act="view">閲覧</button> <button data-fn="${encodeURIComponent(f.filename)}" data-act="del">削除</button>`;
-			}
-			tr.innerHTML = `<td>${escapeHtml(f.title)}</td><td>${escapeHtml(f.filename)}</td><td>${btns}</td>`;
-			fileList.appendChild(tr);
-		});
-	}
+    // 自分のアップロード履歴取得（タイトル名でフィルタ）
+    function loadMyUploads() {
+        myUploads = allFiles.filter(f => f.uploader === currentUser);
+    }
 
-	// ボタン操作
-	fileList.onclick = function(e) {
-		if (e.target.tagName === 'BUTTON') {
-			const fn = e.target.getAttribute('data-fn');
-			const act = e.target.getAttribute('data-act');
-			if (act === 'dl') {
-				window.open(API_BASE + '/download/' + fn, '_blank');
-			} else if (act === 'preview') {
-				apiFetch('/view/' + fn).then(r => {
-					if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('application/json')) {
-						return r.json();
-					} else if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('image/')) {
-						showModal(`<img src='${API_BASE}/view/${fn}' style='max-width:90vw;max-height:70vh;'>`);
-						return null;
-					} else if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('video/')) {
-						showModal(`<video src='${API_BASE}/view/${fn}' controls style='max-width:90vw;max-height:70vh;'></video>`);
-						return null;
-					} else {
-						showModal('プレビューできません');
-						return null;
-					}
-				}).then(data => {
-					if (!data) return;
-					if (data.success && data.type === 'text') {
-						showModal(`<pre style='max-width:90vw;max-height:70vh;overflow:auto;'>${escapeHtml(data.content)}</pre>`);
-					} else if (data.error) {
-						showModal(data.error);
-					}
-				});
-			} else if (act === 'view') {
-				apiFetch('/view/' + fn).then(r => r.json()).then(data => {
-					if (data.success) {
-						if (data.type === 'text') {
-							alert('内容:\n' + data.content);
-						} else {
-							window.open(API_BASE + '/view/' + fn, '_blank');
-						}
-					} else {
-						alert(data.error || '閲覧できません');
-					}
-				});
-			} else if (act === 'del') {
-				if (confirm('本当に削除しますか？')) {
-					apiFetch('/delete/' + fn, {method: 'POST'}).then(r => r.json()).then(data => {
-						if (data.success) {
-							loadFiles();
-						} else {
-							alert(data.error || '削除できません');
-						}
-					});
-				}
-			}
-		}
-	};
+    // ギャラリー表示
+    function renderGallery(files) {
+        galleryList.innerHTML = '';
+        // 最大8個横並び
+        const showFiles = files.slice(0, 32); // 4行分
+        showFiles.forEach(f => {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            // サムネイル
+            let thumb = '';
+            const ext = f.filename.split('.').pop().toLowerCase();
+            if (["jpg","jpeg","png","gif","bmp","webp"].includes(ext)) {
+                thumb = `<img class='gallery-thumb' src='${API_BASE}/view/${encodeURIComponent(f.filename)}'>`;
+            } else if (["mp4","webm","mov","avi"].includes(ext)) {
+                thumb = `<video class='gallery-thumb' src='${API_BASE}/view/${encodeURIComponent(f.filename)}' controls muted></video>`;
+            } else if (["txt","md","log","py","js","json","csv"].includes(ext)) {
+                thumb = `<div class='gallery-thumb' style='display:flex;align-items:center;justify-content:center;font-size:2rem;color:#888;'>TXT</div>`;
+            } else {
+                thumb = `<div class='gallery-thumb' style='display:flex;align-items:center;justify-content:center;font-size:2rem;color:#888;'>?</div>`;
+            }
+            item.innerHTML = `
+                ${thumb}
+                <div class='gallery-title'>${escapeHtml(f.title)}</div>
+                <div class='gallery-btns'>
+                    <button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button>
+                </div>
+            `;
+            // DL履歴記録
+            item.querySelector('button[data-act="dl"]').onclick = function() {
+                window.open(API_BASE + '/download/' + encodeURIComponent(f.filename), '_blank');
+                addHistory('dl', f);
+            };
+            // サムネイルクリックでプレビュー
+            item.querySelector('.gallery-thumb').onclick = function() {
+                previewFile(f);
+                addHistory('view', f);
+            };
+            galleryList.appendChild(item);
+        });
+    }
 
-	// プレビューモーダル
-	function showModal(html) {
-		let modal = document.getElementById('preview-modal');
-		if (!modal) {
-			modal = document.createElement('div');
-			modal.id = 'preview-modal';
-			modal.style.position = 'fixed';
-			modal.style.left = '0';
-			modal.style.top = '0';
-			modal.style.width = '100vw';
-			modal.style.height = '100vh';
-			modal.style.background = 'rgba(0,0,0,0.7)';
-			modal.style.display = 'flex';
-			modal.style.alignItems = 'center';
-			modal.style.justifyContent = 'center';
-			modal.style.zIndex = '9999';
-			modal.onclick = function() { modal.remove(); };
-			document.body.appendChild(modal);
-		}
-		modal.innerHTML = `<div style='background:#fff;padding:24px;border-radius:8px;max-width:95vw;max-height:80vh;overflow:auto;position:relative;'>${html}<br><button style='position:absolute;top:8px;right:8px;' onclick='this.closest("#preview-modal").remove()'>閉じる</button></div>`;
-	}
+    // プレビュー
+    function previewFile(f) {
+        const ext = f.filename.split('.').pop().toLowerCase();
+        if (["jpg","jpeg","png","gif","bmp","webp"].includes(ext)) {
+            showModal(`<img src='${API_BASE}/view/${encodeURIComponent(f.filename)}' style='max-width:90vw;max-height:70vh;'>`);
+        } else if (["mp4","webm","mov","avi"].includes(ext)) {
+            showModal(`<video src='${API_BASE}/view/${encodeURIComponent(f.filename)}' controls style='max-width:90vw;max-height:70vh;'></video>`);
+        } else {
+            apiFetch('/view/' + encodeURIComponent(f.filename)).then(r => r.json()).then(data => {
+                if (data.success && data.type === 'text') {
+                    showModal(`<pre style='max-width:90vw;max-height:70vh;overflow:auto;'>${escapeHtml(data.content)}</pre>`);
+                } else {
+                    showModal(data.error || 'プレビューできません');
+                }
+            });
+        }
+    }
 
-	// 検索
-	searchInput.addEventListener('input', function() {
-		const q = searchInput.value.trim();
-		if (!q) {
-			renderFiles(allFiles);
-		} else {
-			renderFiles(allFiles.filter(f => f.title.includes(q)));
-		}
-	});
+    // 検索
+    searchInput.addEventListener('input', function() {
+        const q = searchInput.value.trim();
+        if (!q) {
+            renderGallery(allFiles);
+        } else {
+            renderGallery(allFiles.filter(f => f.title.includes(q)));
+        }
+    });
 
-	// HTMLエスケープ
-	function escapeHtml(str) {
-		return str.replace(/[&<>'"]/g, function(c) {
-			return {'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c];
-		});
-	}
+    // 履歴管理
+    function addHistory(type, f) {
+        let key = type === 'dl' ? 'dlHistory' : 'viewHistory';
+        let arr = JSON.parse(localStorage.getItem(key) || '[]');
+        arr.unshift({title: f.title, filename: f.filename, time: Date.now()});
+        arr = arr.slice(0, 30);
+        localStorage.setItem(key, JSON.stringify(arr));
+    }
 
-	// 登録フォーム
-	const registerForm = document.getElementById('register-form');
-	const registerMsg = document.getElementById('register-msg');
-	if (registerForm) {
-		registerForm.onsubmit = function(e) {
-			e.preventDefault();
-			registerMsg.textContent = '';
-			const username = document.getElementById('reg-username').value;
-			const password = document.getElementById('reg-password').value;
-			apiFetch('/register', {
-				method: 'POST',
-				body: new URLSearchParams({username, password})
-			}).then(res => res.json()).then(data => {
-				if (data.success) {
-					registerMsg.style.color = 'green';
-					registerMsg.textContent = '登録成功！ログインしてください';
-					registerForm.reset();
-				} else {
-					registerMsg.style.color = 'red';
-					registerMsg.textContent = data.error || '登録失敗';
-				}
-			});
-		};
-	}
+    // ダッシュボード
+    dashboardBtn.onclick = function() {
+        let html = `<h2>ダッシュボード</h2>`;
+        html += `<h3>自分のアップロード</h3><ul>`;
+        myUploads.forEach(f => {
+            html += `<li>${escapeHtml(f.title)}</li>`;
+        });
+        html += `</ul><h3>閲覧履歴</h3><ul>`;
+        viewHistory.forEach(f => {
+            html += `<li>${escapeHtml(f.title)}</li>`;
+        });
+        html += `</ul><h3>ダウンロード履歴</h3><ul>`;
+        dlHistory.forEach(f => {
+            html += `<li>${escapeHtml(f.title)}</li>`;
+        });
+        html += `</ul><button onclick='document.getElementById("dashboard-modal").style.display="none"'>閉じる</button>`;
+        dashboardModal.innerHTML = `<div>${html}</div>`;
+        dashboardModal.style.display = '';
+    };
 
-	checkLogin();
+    // モーダル
+    function showModal(html) {
+        let modal = document.getElementById('preview-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'preview-modal';
+            modal.style.position = 'fixed';
+            modal.style.left = '0';
+            modal.style.top = '0';
+            modal.style.width = '100vw';
+            modal.style.height = '100vh';
+            modal.style.background = 'rgba(0,0,0,0.7)';
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            modal.style.zIndex = '9999';
+            modal.onclick = function() { modal.remove(); };
+            document.body.appendChild(modal);
+        }
+        modal.innerHTML = `<div style='background:#fff;padding:24px;border-radius:8px;max-width:95vw;max-height:80vh;overflow:auto;position:relative;'>${html}<br><button style='position:absolute;top:8px;right:8px;' onclick='this.closest("#preview-modal").remove()'>閉じる</button></div>`;
+    }
+
+    // HTMLエスケープ
+    function escapeHtml(str) {
+        return str.replace(/[&<>'"]/g, function(c) {
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','\'':'&#39;','"':'&quot;'}[c];
+        });
+    }
+
+    // 登録フォーム
+    const registerForm = document.getElementById('register-form');
+    const registerMsg = document.getElementById('register-msg');
+    if (registerForm) {
+        registerForm.onsubmit = function(e) {
+            e.preventDefault();
+            registerMsg.textContent = '';
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            apiFetch('/register', {
+                method: 'POST',
+                body: new URLSearchParams({username, password})
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    registerMsg.style.color = 'green';
+                    registerMsg.textContent = '登録成功！ログインしてください';
+                    registerForm.reset();
+                } else {
+                    registerMsg.style.color = 'red';
+                    registerMsg.textContent = data.error || '登録失敗';
+                }
+            });
+        };
+    }
+
+    checkLogin();
 });

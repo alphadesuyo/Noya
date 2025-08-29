@@ -2,10 +2,21 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ファイル共有サービス</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Noyaファイル共有</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+    <header class="header">
+        <div class="logo">Noya</div>
+        <div class="search-wrap">
+            <input type="text" id="search-input" placeholder="タイトル検索">
+        </div>
+        <div class="account-wrap" id="account-wrap">
+            <span id="account-name"></span>
+            <button id="dashboard-btn">ダッシュボード</button>
+            <button id="logout-btn">ログアウト</button>
+        </div>
+    </header>
     <div id="login-area">
         <h2>ログイン</h2>
         <form id="login-form">
@@ -24,21 +35,21 @@
         <div id="register-msg" class="error"></div>
     </div>
     <div id="main-area" style="display:none;">
-        <button id="logout-btn">ログアウト</button>
-        <h2>ファイルアップロード</h2>
-        <form id="upload-form">
-            <input type="text" id="title" placeholder="タイトル" required>
-            <input type="file" id="file" required>
-            <button type="submit">アップロード</button>
-        </form>
-        <div id="upload-msg"></div>
-        <h2>ファイル一覧</h2>
-        <table id="file-list">
-            <thead><tr><th>タイトル</th><th>ファイル名</th><th>ダウンロード</th></tr></thead>
-            <tbody></tbody>
-        </table>
+        <section class="upload-section">
+            <h2>ファイルアップロード</h2>
+            <form id="upload-form">
+                <input type="text" id="title" placeholder="タイトル" required>
+                <input type="file" id="file" required>
+                <button type="submit">アップロード</button>
+            </form>
+            <div id="upload-msg"></div>
+        </section>
+        <section class="gallery-section">
+            <h2>ファイルギャラリー</h2>
+            <div id="gallery-list" class="gallery-list"></div>
+        </section>
     </div>
-    <script src="script.js"></script>
+    <div id="dashboard-modal" style="display:none;"></div>
+    <script src="/static/script.js"></script>
 </body>
 </html>
-
