@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// ログイン状態確認
 	function checkLogin() {
-		apiFetch('https://caught-cheats-sentences-salem.trycloudflare.com/files').then(res => res.json()).then(data => {
+		apiFetch('/files').then(res => res.json()).then(data => {
 			if (data.success) {
 				// 管理者判定
 				apiFetch('/whoami').then(r => r.json()).then(u => {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	loginForm.onsubmit = function(e) {
 		e.preventDefault();
 		loginError.textContent = '';
-		apiFetch('https://caught-cheats-sentences-salem.trycloudflare.com/login', {
+		apiFetch('/login', {
 			method: 'POST',
 			body: new URLSearchParams({
 				username: document.getElementById('username').value,
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// ログアウト
 	logoutBtn.onclick = function() {
-		apiFetch('https://caught-cheats-sentences-salem.trycloudflare.com/logout', {method: 'POST'}).then(() => {
+		apiFetch('/logout', {method: 'POST'}).then(() => {
 			checkLogin();
 		});
 	};
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const formData = new FormData();
 		formData.append('title', document.getElementById('title').value);
 		formData.append('file', document.getElementById('file').files[0]);
-		apiFetch('https://caught-cheats-sentences-salem.trycloudflare.com/upload', {
+		apiFetch('/upload', {
 			method: 'POST',
 			body: formData
 		}).then(res => res.json()).then(data => {
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	// ファイル一覧取得
 	let allFiles = [];
 	function loadFiles() {
-		apiFetch('https://caught-cheats-sentences-salem.trycloudflare.com/files').then(res => res.json()).then(data => {
+		apiFetch('/files').then(res => res.json()).then(data => {
 			if (data.success) {
 				allFiles = data.files;
 				renderFiles(allFiles);
