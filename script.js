@@ -120,51 +120,57 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ログイン
-    loginForm.onsubmit = function(e) {
-        e.preventDefault();
-        loginError.textContent = '';
-        apiFetch('/login', {
-            method: 'POST',
-            body: new URLSearchParams({
-                username: document.getElementById('username').value,
-                password: document.getElementById('password').value
-            })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                checkLogin();
-            } else {
-                loginError.textContent = data.error || 'ログイン失敗';
-            }
-        });
-    };
+    if (loginForm) {
+        loginForm.onsubmit = function(e) {
+            e.preventDefault();
+            loginError.textContent = '';
+            apiFetch('/login', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                })
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    checkLogin();
+                } else {
+                    loginError.textContent = data.error || 'ログイン失敗';
+                }
+            });
+        };
+    }
 
     // ログアウト
-    logoutBtn.onclick = function() {
-        apiFetch('/logout', {method: 'POST'}).then(() => {
-            checkLogin();
-        });
-    };
+    if (logoutBtn) {
+        logoutBtn.onclick = function() {
+            apiFetch('/logout', {method: 'POST'}).then(() => {
+                checkLogin();
+            });
+        };
+    }
 
     // アップロード
-    uploadForm.onsubmit = function(e) {
-        e.preventDefault();
-        uploadMsg.textContent = '';
-        const formData = new FormData();
-        formData.append('title', document.getElementById('title').value);
-        formData.append('file', document.getElementById('file').files[0]);
-        apiFetch('/upload', {
-            method: 'POST',
-            body: formData
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                uploadMsg.textContent = 'アップロード成功';
-                uploadForm.reset();
-                loadFiles();
-            } else {
-                uploadMsg.textContent = data.error || 'アップロード失敗';
-            }
-        });
-    };
+    if (uploadForm) {
+        uploadForm.onsubmit = function(e) {
+            e.preventDefault();
+            uploadMsg.textContent = '';
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('file', document.getElementById('file').files[0]);
+            apiFetch('/upload', {
+                method: 'POST',
+                body: formData
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    uploadMsg.textContent = 'アップロード成功';
+                    uploadForm.reset();
+                    loadFiles();
+                } else {
+                    uploadMsg.textContent = data.error || 'アップロード失敗';
+                }
+            });
+        };
+    }
 
     // ファイル一覧取得
     function loadFiles() {
@@ -395,5 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
+    checkLogin();
+    // --- 自動ログイン判定（ページロード時） ---
     checkLogin();
 });
