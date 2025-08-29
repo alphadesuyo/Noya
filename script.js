@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
             apiFetch('/register', {
                 method: 'POST',
-                body: new URLSearchParams({username, password})
+                body: new URLSearchParams({username, password, terms: "true"})
             }).then(res => res.json()).then(data => {
                 if (data.success) {
                     registerMsg.style.color = 'green';
@@ -508,4 +508,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- 自動ログイン判定（ページロード時） ---
     checkLogin();
 });
-
