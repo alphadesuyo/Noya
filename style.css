@@ -35,14 +35,13 @@ button:hover { background: #1565c0; }
 #dashboard-modal { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
 #dashboard-modal > div { background: #fff; padding: 32px; border-radius: 12px; min-width: 320px; max-width: 90vw; max-height: 80vh; overflow: auto; }
 
-/* --- スマホ用レスポンシブ (幅600px以下) --- */
-@media screen and (max-width: 600px) {
+/* スマホ縦〜タブレットまで */
+@media screen and (max-width: 900px) {
   body {
     padding: 10px;
     font-size: 15px;
   }
 
-  /* ヘッダー */
   .header {
     flex-direction: column;
     align-items: flex-start;
@@ -50,7 +49,7 @@ button:hover { background: #1565c0; }
   }
 
   .logo {
-    font-size: 24px;  /* PCより大きめで目立たせる */
+    font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
   }
@@ -106,7 +105,7 @@ button:hover { background: #1565c0; }
   /* ギャラリー */
   .gallery-list {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* スマホは2列表示 */
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
   }
 
@@ -120,3 +119,5 @@ button:hover { background: #1565c0; }
     height: auto;
   }
 }
+
+
