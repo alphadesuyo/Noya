@@ -1,6 +1,6 @@
 // ==== APIサーバーURL設定 ====
 // 例: Netlifyで公開時は https://xxxx.trycloudflare.com などに書き換え
-const API_BASE = window.API_BASE_URL || '';
+const API_BASE = window.API_BASE_URL || 'https://caught-cheats-sentences-salem.trycloudflare.com/';
 
 function apiFetch(path, options = {}) {
     options.credentials = 'include'; // Cookie送信
