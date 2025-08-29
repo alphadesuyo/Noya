@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Noyaファイル共有</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <header class="header">
@@ -13,7 +13,7 @@
         </div>
         <div class="account-wrap" id="account-wrap">
             <span id="account-name"></span>
-            <button id="dashboard-btn">ダッシュボード</button>
+            <span id="account-icon" class="account-icon" title="アカウント"><svg width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="12" r="7" fill="#fff"/><ellipse cx="16" cy="26" rx="10" ry="6" fill="#fff"/></svg></span>
             <button id="logout-btn">ログアウト</button>
         </div>
     </header>
@@ -35,22 +35,12 @@
         <div id="register-msg" class="error"></div>
     </div>
     <div id="main-area" style="display:none;">
-        <section class="upload-section">
-            <h2>ファイルアップロード</h2>
-            <form id="upload-form">
-                <input type="text" id="title" placeholder="タイトル" required>
-                <input type="file" id="file" required>
-                <button type="submit">アップロード</button>
-            </form>
-            <div id="upload-msg"></div>
-        </section>
         <section class="gallery-section">
             <h2>ファイルギャラリー</h2>
             <div id="gallery-list" class="gallery-list"></div>
         </section>
     </div>
-    <div id="dashboard-modal" style="display:none;"></div>
-    <script src="script.js"></script>
+    <div id="account-modal" style="display:none;"></div>
+    <script src="/static/script.js"></script>
 </body>
 </html>
-

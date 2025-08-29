@@ -1,3 +1,14 @@
+.account-icon { display: inline-block; width: 32px; height: 32px; border-radius: 50%; background: #fff; margin-left: 8px; cursor: pointer; vertical-align: middle; box-shadow: 0 1px 4px #bbb2; }
+.account-icon svg { vertical-align: middle; }
+
+#account-modal { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+#account-modal > div { background: #fff; padding: 32px; border-radius: 12px; min-width: 320px; max-width: 95vw; max-height: 90vh; overflow: auto; }
+
+.upload-section-modal { margin-bottom: 32px; }
+.upload-section-modal h2 { margin-top: 0; }
+.upload-section-modal form { display: flex; flex-direction: column; gap: 8px; }
+.upload-section-modal input[type="text"], .upload-section-modal input[type="file"] { width: 100%; }
+.upload-section-modal button { align-self: flex-end; }
 body { font-family: 'Segoe UI', sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
 .header { display: flex; align-items: center; justify-content: space-between; background: #1976d2; color: #fff; padding: 12px 32px; }
 .logo { font-size: 2rem; font-weight: bold; letter-spacing: 2px; }
