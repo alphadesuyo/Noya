@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>通報一覧（管理者用）</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    #reportList {
+      max-width: 1000px;
+      margin: auto;
+    }
+    .report-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .report-meta {
+      flex: 1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+    .report-thumb {
+      max-width: 200px;
+      max-height: 150px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+    .ban-btn {
+      background: #e53935;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+    .ban-btn:hover {
+      background: #c62828;
+    }
+    .report-media {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>通報一覧（管理者用）</h1>
+  <div id="reportList">読み込み中...</div>
+
+  <script src="script.js"></script>
+  <script>
+    async function loadReports() {
+      try {
+        const res = await apiFetch("/admin/reports");
+        const data = await res.json();
+        if (!data.success) {
+          document.getElementById("reportList").innerText = data.error || "読み込み失敗";
+          return;
+        }
+        const list = document.getElementById("reportList");
+        list.innerHTML = "";
+        data.reports.forEach(r => {
+          const item = document.createElement("div");
+          item.className = "report-item";
+          let media = "";
+          if (r.thumbnail_url) {
+            const ext = r.target_file.split(".").pop().toLowerCase();
+            if (["jpg","jpeg","png","gif","webp"].includes(ext)) {
+              media = `<img src="${r.thumbnail_url}" class="report-thumb">`;
+            } else if (["mp4","webm","mov","avi"].includes(ext)) {
+              media = `<video src="${r.thumbnail_url}" class="report-thumb" controls></video>`;
+            } else {
+              media = `<div class="report-thumb">ファイル</div>`;
+            }
+          }
+          item.innerHTML = `
+            <div class="report-meta">
+              <b>ファイル:</b> ${r.title} <br>
+              <b>アップローダー:</b> ${r.uploader || "不明"} <br>
+              <b>通報者:</b> ${r.reporter} <br>
+              <b>日時:</b> ${r.created_at}
+            </div>
+            <div class="report-media">${media}</div>
+            <button data-user="${r.uploader}" class="ban-btn">BAN</button>
+          `;
+          list.appendChild(item);
+
+          // BANボタン動作
+          item.querySelector(".ban-btn").onclick = async () => {
+            if (!r.uploader) {
+              alert("アップローダー情報が不明です");
+              return;
+            }
+            if (confirm(`${r.uploader} をBANしますか？`)) {
+              const res = await apiFetch(`/ban/${r.uploader}`, {method:"POST"});
+              const d = await res.json();
+              if (d.success) {
+                alert("BANしました");
+              } else {
+                alert(d.error || "BAN失敗");
+              }
+            }
+          };
+        });
+      } catch (err) {
+        document.getElementById("reportList").innerText = "エラー: " + err.message;
+      }
+    }
+
+    loadReports();
+  </script>
+</body>
+</html>
