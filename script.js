@@ -238,11 +238,15 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 thumb = `<div class='gallery-thumb' style='display:flex;align-items:center;justify-content:center;font-size:2rem;color:#888;'>?</div>`;
             }
+            let btns = `<button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button>`;
+            if (isAdmin) {
+                btns += ` <button data-fn="${encodeURIComponent(f.filename)}" data-act="del" style="background:#e53935;">削除</button>`;
+            }
             item.innerHTML = `
                 ${thumb}
                 <div class='gallery-title'>${escapeHtml(f.title)}</div>
                 <div class='gallery-btns'>
-                    <button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button>
+                    ${btns}
                 </div>
             `;
             // DL履歴記録
@@ -255,6 +259,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 previewFile(f);
                 addHistory('view', f);
             };
+            // 管理者削除ボタン
+            if (isAdmin) {
+                const delBtn = item.querySelector('button[data-act="del"]');
+                if (delBtn) {
+                    delBtn.onclick = function() {
+                        if (confirm('本当に削除しますか？')) {
+                            apiFetch('/delete/' + encodeURIComponent(f.filename), {method: 'POST'})
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        loadFiles();
+                                    } else {
+                                        alert(data.error || '削除失敗');
+                                    }
+                                });
+                        }
+                    };
+                }
+            }
             galleryList.appendChild(item);
         });
     }
