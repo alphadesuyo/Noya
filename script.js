@@ -265,13 +265,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (delBtn) {
                     delBtn.onclick = function() {
                         if (confirm('本当に削除しますか？')) {
+                            // 先にUIから消す
+                            item.remove();
                             apiFetch('/delete/' + encodeURIComponent(f.filename), {method: 'POST'})
                                 .then(res => res.json())
                                 .then(data => {
-                                    if (data.success) {
-                                        loadFiles();
-                                    } else {
+                                    if (!data.success) {
                                         alert(data.error || '削除失敗');
+                                        // 失敗時は再描画
+                                        loadFiles();
                                     }
                                 });
                         }
