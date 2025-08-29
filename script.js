@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE_URL || 'https://carefully-marriage-maintained-draw.trycloudflare.com';
+const API_BASE = window.API_BASE_URL || 'https://pine-enables-video-smile.trycloudflare.com';
 
 function apiFetch(path, options = {}) {
     options.credentials = 'include'; // Cookie送信
@@ -508,3 +508,4 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- 自動ログイン判定（ページロード時） ---
     checkLogin();
 });
+
