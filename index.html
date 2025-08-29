@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ファイル共有サービス</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div id="login-area">
@@ -14,6 +14,14 @@
             <button type="submit">ログイン</button>
         </form>
         <div id="login-error" class="error"></div>
+        <hr>
+        <h3>新規登録</h3>
+        <form id="register-form">
+            <input type="text" id="reg-username" placeholder="ユーザー名" required><br>
+            <input type="password" id="reg-password" placeholder="パスワード" required><br>
+            <button type="submit">登録</button>
+        </form>
+        <div id="register-msg" class="error"></div>
     </div>
     <div id="main-area" style="display:none;">
         <button id="logout-btn">ログアウト</button>
@@ -30,6 +38,6 @@
             <tbody></tbody>
         </table>
     </div>
-    <script src="script.js"></script>
+    <script src="/static/script.js"></script>
 </body>
 </html>

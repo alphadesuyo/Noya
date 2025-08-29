@@ -164,5 +164,30 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
+	// 登録フォーム
+	const registerForm = document.getElementById('register-form');
+	const registerMsg = document.getElementById('register-msg');
+	if (registerForm) {
+		registerForm.onsubmit = function(e) {
+			e.preventDefault();
+			registerMsg.textContent = '';
+			const username = document.getElementById('reg-username').value;
+			const password = document.getElementById('reg-password').value;
+			apiFetch('/register', {
+				method: 'POST',
+				body: new URLSearchParams({username, password})
+			}).then(res => res.json()).then(data => {
+				if (data.success) {
+					registerMsg.style.color = 'green';
+					registerMsg.textContent = '登録成功！ログインしてください';
+					registerForm.reset();
+				} else {
+					registerMsg.style.color = 'red';
+					registerMsg.textContent = data.error || '登録失敗';
+				}
+			});
+		};
+	}
+
 	checkLogin();
 });
