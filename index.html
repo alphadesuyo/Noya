@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ファイル共有サービス</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="login-area">
+        <h2>ログイン</h2>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="ユーザー名" required><br>
+            <input type="password" id="password" placeholder="パスワード" required><br>
+            <button type="submit">ログイン</button>
+        </form>
+        <div id="login-error" class="error"></div>
+    </div>
+    <div id="main-area" style="display:none;">
+        <button id="logout-btn">ログアウト</button>
+        <h2>ファイルアップロード</h2>
+        <form id="upload-form">
+            <input type="text" id="title" placeholder="タイトル" required>
+            <input type="file" id="file" required>
+            <button type="submit">アップロード</button>
+        </form>
+        <div id="upload-msg"></div>
+        <h2>ファイル一覧</h2>
+        <table id="file-list">
+            <thead><tr><th>タイトル</th><th>ファイル名</th><th>ダウンロード</th></tr></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

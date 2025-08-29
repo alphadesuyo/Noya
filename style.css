@@ -1,0 +1,10 @@
+body { font-family: sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+#login-area, #main-area { max-width: 400px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; box-shadow: 0 2px 8px #ccc; }
+h2 { margin-top: 0; }
+input[type="text"], input[type="password"], input[type="file"] { width: 100%; margin-bottom: 12px; padding: 8px; }
+button { padding: 8px 16px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+button:hover { background: #1565c0; }
+.error { color: red; margin-top: 8px; }
+#file-list { width: 100%; border-collapse: collapse; margin-top: 16px; }
+#file-list th, #file-list td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+#file-list th { background: #e3e3e3; }
