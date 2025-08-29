@@ -19,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const galleryList = document.getElementById('gallery-list');
     const searchInput = document.getElementById('search-input');
     const accountName = document.getElementById('account-name');
-    const dashboardBtn = document.getElementById('dashboard-btn');
-    const dashboardModal = document.getElementById('dashboard-modal');
+        // const dashboardBtn = document.getElementById('dashboard-btn');
+        // const dashboardModal = document.getElementById('dashboard-modal');
     const accountIcon = document.getElementById('account-icon');
     const accountModal = document.getElementById('account-modal');
     const header = document.querySelector('.header');
@@ -341,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
             }
         };
-    }
 
     // モーダル
     function showModal(html) {
@@ -363,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.body.appendChild(modal);
         }
         modal.innerHTML = `<div style='background:#fff;padding:24px;border-radius:8px;max-width:95vw;max-height:80vh;overflow:auto;position:relative;'>${html}<br><button style='position:absolute;top:8px;right:8px;' onclick='this.closest("#preview-modal").remove()'>閉じる</button></div>`;
+    }
     }
 
     // HTMLエスケープ
