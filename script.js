@@ -105,7 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		fileList.innerHTML = '';
 		files.forEach(f => {
 			const tr = document.createElement('tr');
-			let btns = `<button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button>`;
+			let btns = `<button data-fn="${encodeURIComponent(f.filename)}" data-act="dl">DL</button> `;
+			btns += `<button data-fn="${encodeURIComponent(f.filename)}" data-act="preview">プレビュー</button>`;
 			if (isAdmin) {
 				btns += ` <button data-fn="${encodeURIComponent(f.filename)}" data-act="view">閲覧</button> <button data-fn="${encodeURIComponent(f.filename)}" data-act="del">削除</button>`;
 			}
@@ -121,6 +122,28 @@ document.addEventListener('DOMContentLoaded', function() {
 			const act = e.target.getAttribute('data-act');
 			if (act === 'dl') {
 				window.open(API_BASE + '/download/' + fn, '_blank');
+			} else if (act === 'preview') {
+				apiFetch('/view/' + fn).then(r => {
+					if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('application/json')) {
+						return r.json();
+					} else if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('image/')) {
+						showModal(`<img src='${API_BASE}/view/${fn}' style='max-width:90vw;max-height:70vh;'>`);
+						return null;
+					} else if (r.headers.get('content-type') && r.headers.get('content-type').startsWith('video/')) {
+						showModal(`<video src='${API_BASE}/view/${fn}' controls style='max-width:90vw;max-height:70vh;'></video>`);
+						return null;
+					} else {
+						showModal('プレビューできません');
+						return null;
+					}
+				}).then(data => {
+					if (!data) return;
+					if (data.success && data.type === 'text') {
+						showModal(`<pre style='max-width:90vw;max-height:70vh;overflow:auto;'>${escapeHtml(data.content)}</pre>`);
+					} else if (data.error) {
+						showModal(data.error);
+					}
+				});
 			} else if (act === 'view') {
 				apiFetch('/view/' + fn).then(r => r.json()).then(data => {
 					if (data.success) {
@@ -146,6 +169,28 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 	};
+
+	// プレビューモーダル
+	function showModal(html) {
+		let modal = document.getElementById('preview-modal');
+		if (!modal) {
+			modal = document.createElement('div');
+			modal.id = 'preview-modal';
+			modal.style.position = 'fixed';
+			modal.style.left = '0';
+			modal.style.top = '0';
+			modal.style.width = '100vw';
+			modal.style.height = '100vh';
+			modal.style.background = 'rgba(0,0,0,0.7)';
+			modal.style.display = 'flex';
+			modal.style.alignItems = 'center';
+			modal.style.justifyContent = 'center';
+			modal.style.zIndex = '9999';
+			modal.onclick = function() { modal.remove(); };
+			document.body.appendChild(modal);
+		}
+		modal.innerHTML = `<div style='background:#fff;padding:24px;border-radius:8px;max-width:95vw;max-height:80vh;overflow:auto;position:relative;'>${html}<br><button style='position:absolute;top:8px;right:8px;' onclick='this.closest("#preview-modal").remove()'>閉じる</button></div>`;
+	}
 
 	// 検索
 	searchInput.addEventListener('input', function() {
