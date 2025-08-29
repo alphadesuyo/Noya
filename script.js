@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentUser = null;
     let allFiles = [];
     let myUploads = [];
-    let viewHistory = JSON.parse(localStorage.getItem('viewHistory') || '[]');
-    let dlHistory = JSON.parse(localStorage.getItem('dlHistory') || '[]');
+    let viewHistory = [];
+    let dlHistory = [];
 
     // ログイン状態確認
     function checkLogin() {
@@ -42,6 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 apiFetch('/whoami').then(r => r.json()).then(u => {
                     isAdmin = u.user === 'admin';
                     currentUser = u.user;
+                    // ユーザーごとに履歴を切り替え
+                    viewHistory = JSON.parse(localStorage.getItem('viewHistory_' + currentUser) || '[]');
+                    dlHistory = JSON.parse(localStorage.getItem('dlHistory_' + currentUser) || '[]');
                     accountName.textContent = currentUser;
                     loginArea.style.display = 'none';
                     mainArea.style.display = '';
@@ -244,22 +247,43 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 検索
-    searchInput.addEventListener('input', function() {
+    // 検索実行関数
+    function doSearch() {
         const q = searchInput.value.trim();
         if (!q) {
             renderGallery(allFiles);
         } else {
             renderGallery(allFiles.filter(f => f.title.includes(q)));
         }
+    }
+    searchInput.addEventListener('input', doSearch);
+    // エンターキーで検索
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            doSearch();
+        }
     });
+    // 虫眼鏡ボタンで検索
+    const searchBtn = document.getElementById('search-btn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            doSearch();
+        });
+    }
 
     // 履歴管理
     function addHistory(type, f) {
-        let key = type === 'dl' ? 'dlHistory' : 'viewHistory';
+        if (!currentUser) return;
+        let key = (type === 'dl' ? 'dlHistory_' : 'viewHistory_') + currentUser;
         let arr = JSON.parse(localStorage.getItem(key) || '[]');
         arr.unshift({title: f.title, filename: f.filename, time: Date.now()});
         arr = arr.slice(0, 30);
         localStorage.setItem(key, JSON.stringify(arr));
+        // メモリ上の履歴も更新
+        if (type === 'dl') dlHistory = arr;
+        else viewHistory = arr;
     }
 
     // dashboardBtnは現状UIに存在しないため、関連コードを完全削除
