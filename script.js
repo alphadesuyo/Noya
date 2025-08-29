@@ -23,6 +23,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const dashboardModal = document.getElementById('dashboard-modal');
     const accountIcon = document.getElementById('account-icon');
     const accountModal = document.getElementById('account-modal');
+    const header = document.querySelector('.header');
+
+    // 初期状態でヘッダー非表示
+    header.style.display = 'none';
 
     let isAdmin = false;
     let currentUser = null;
@@ -35,18 +39,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkLogin() {
         apiFetch('/files').then(res => res.json()).then(data => {
             if (data.success) {
-                // 管理者判定
                 apiFetch('/whoami').then(r => r.json()).then(u => {
                     isAdmin = u.user === 'admin';
                     currentUser = u.user;
                     accountName.textContent = currentUser;
                     loginArea.style.display = 'none';
                     mainArea.style.display = '';
+                    header.style.display = '';
                     loadFiles();
+                    // myUploadsはloadFilesで更新
                 });
             } else {
                 loginArea.style.display = '';
                 mainArea.style.display = 'none';
+                header.style.display = 'none';
             }
         });
     }
@@ -209,63 +215,65 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // アカウントアイコンでモーダル表示
-    accountIcon.onclick = function() {
-        let html = `<div>`;
-        html += `<div class='upload-section-modal'>
-            <h2>ファイルアップロード</h2>
-            <form id='upload-form-modal'>
-                <input type='text' id='title-modal' placeholder='タイトル' required>
-                <input type='file' id='file-modal' required>
-                <button type='submit'>アップロード</button>
-            </form>
-            <div id='upload-msg-modal'></div>
-        </div>`;
-        html += `<div class='dashboard-section'>`;
-        html += `<h2>ダッシュボード</h2>`;
-        html += `<h3>自分のアップロード</h3><ul>`;
-        myUploads.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul><h3>閲覧履歴</h3><ul>`;
-        viewHistory.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul><h3>ダウンロード履歴</h3><ul>`;
-        dlHistory.forEach(f => {
-            html += `<li>${escapeHtml(f.title)}</li>`;
-        });
-        html += `</ul>`;
-        html += `</div>`;
-        html += `<button onclick='document.getElementById("account-modal").style.display="none"'>閉じる</button>`;
-        html += `</div>`;
-        accountModal.innerHTML = html;
-        accountModal.style.display = '';
+    if (accountIcon) {
+        accountIcon.onclick = function() {
+            let html = `<div>`;
+            html += `<div class='upload-section-modal'>
+                <h2>ファイルアップロード</h2>
+                <form id='upload-form-modal'>
+                    <input type='text' id='title-modal' placeholder='タイトル' required>
+                    <input type='file' id='file-modal' required>
+                    <button type='submit'>アップロード</button>
+                </form>
+                <div id='upload-msg-modal'></div>
+            </div>`;
+            html += `<div class='dashboard-section'>`;
+            html += `<h2>ダッシュボード</h2>`;
+            html += `<h3>自分のアップロード</h3><ul>`;
+            myUploads.forEach(f => {
+                html += `<li>${escapeHtml(f.title)}</li>`;
+            });
+            html += `</ul><h3>閲覧履歴</h3><ul>`;
+            viewHistory.forEach(f => {
+                html += `<li>${escapeHtml(f.title)}</li>`;
+            });
+            html += `</ul><h3>ダウンロード履歴</h3><ul>`;
+            dlHistory.forEach(f => {
+                html += `<li>${escapeHtml(f.title)}</li>`;
+            });
+            html += `</ul>`;
+            html += `</div>`;
+            html += `<button onclick='document.getElementById("account-modal").style.display="none"'>閉じる</button>`;
+            html += `</div>`;
+            accountModal.innerHTML = html;
+            accountModal.style.display = '';
 
-        // モーダル内アップロードフォームの動作
-        const uploadFormModal = document.getElementById('upload-form-modal');
-        const uploadMsgModal = document.getElementById('upload-msg-modal');
-        if (uploadFormModal) {
-            uploadFormModal.onsubmit = function(e) {
-                e.preventDefault();
-                uploadMsgModal.textContent = '';
-                const formData = new FormData();
-                formData.append('title', document.getElementById('title-modal').value);
-                formData.append('file', document.getElementById('file-modal').files[0]);
-                apiFetch('/upload', {
-                    method: 'POST',
-                    body: formData
-                }).then(res => res.json()).then(data => {
-                    if (data.success) {
-                        uploadMsgModal.textContent = 'アップロード成功';
-                        uploadFormModal.reset();
-                        loadFiles();
-                    } else {
-                        uploadMsgModal.textContent = data.error || 'アップロード失敗';
-                    }
-                });
-            };
-        }
-    };
+            // モーダル内アップロードフォームの動作
+            const uploadFormModal = document.getElementById('upload-form-modal');
+            const uploadMsgModal = document.getElementById('upload-msg-modal');
+            if (uploadFormModal) {
+                uploadFormModal.onsubmit = function(e) {
+                    e.preventDefault();
+                    uploadMsgModal.textContent = '';
+                    const formData = new FormData();
+                    formData.append('title', document.getElementById('title-modal').value);
+                    formData.append('file', document.getElementById('file-modal').files[0]);
+                    apiFetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    }).then(res => res.json()).then(data => {
+                        if (data.success) {
+                            uploadMsgModal.textContent = 'アップロード成功';
+                            uploadFormModal.reset();
+                            loadFiles();
+                        } else {
+                            uploadMsgModal.textContent = data.error || 'アップロード失敗';
+                        }
+                    });
+                };
+            }
+        };
+    }
 
     // モーダル
     function showModal(html) {
