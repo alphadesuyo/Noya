@@ -38,10 +38,8 @@ button:hover { background: #1565c0; }
 /* --- スマホ用レスポンシブ (幅600px以下) --- */
 @media screen and (max-width: 600px) {
   body {
-    margin: 0;
-    padding: 0;
+    padding: 10px;
     font-size: 15px;
-    overflow-x: hidden; /* 横スクロール防止 */
   }
 
   /* ヘッダー */
@@ -49,12 +47,10 @@ button:hover { background: #1565c0; }
     flex-direction: column;
     align-items: flex-start;
     padding: 12px;
-    width: 100%;
-    box-sizing: border-box;
   }
 
   .logo {
-    font-size: 24px;
+    font-size: 24px;  /* PCより大きめで目立たせる */
     font-weight: bold;
     margin-bottom: 10px;
   }
@@ -63,14 +59,12 @@ button:hover { background: #1565c0; }
     width: 100%;
     display: flex;
     margin-bottom: 10px;
-    box-sizing: border-box;
   }
 
   .search-wrap input {
     flex: 1;
     font-size: 16px;
     padding: 8px;
-    box-sizing: border-box;
   }
 
   .account-wrap {
@@ -79,13 +73,11 @@ button:hover { background: #1565c0; }
     justify-content: space-between;
     margin-top: 10px;
     font-size: 16px;
-    box-sizing: border-box;
   }
 
   .account-wrap button {
     font-size: 16px;
     padding: 8px 12px;
-    box-sizing: border-box;
   }
 
   /* 登録・ログインフォーム */
@@ -93,7 +85,6 @@ button:hover { background: #1565c0; }
     width: 100%;
     margin: 0 auto;
     padding: 16px;
-    box-sizing: border-box;
   }
 
   #login-form input, #register-form input {
@@ -115,30 +106,17 @@ button:hover { background: #1565c0; }
   /* ギャラリー */
   .gallery-list {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2列 */
+    grid-template-columns: 1fr 1fr; /* スマホは2列表示 */
     gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0 5px; /* 左右に少し余白 */
   }
 
   .gallery-item {
     font-size: 14px;
     padding: 6px;
-    box-sizing: border-box;
   }
 
   .gallery-thumb {
     max-width: 100%;
     height: auto;
-    display: block;
-    margin: 0 auto;
-  }
-
-  /* 規約やプライバシーポリシーのコンテナ */
-  .policy-container {
-    max-width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
   }
 }
