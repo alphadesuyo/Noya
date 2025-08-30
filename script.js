@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
 
+    checkLogin();
+    loadFiles();
     // UI要素取得
     const loginArea = document.getElementById('login-area');
     const mainArea = document.getElementById('main-area');
@@ -56,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     mainArea.style.display = '';
                     header.style.display = '';
                     loadFiles();
-                    // myUploadsはloadFilesで更新
+
+                    // ✅ 管理者リンクを追加
+                    showAdminLink();
                     // アカウントアイコンのイベントバインド（ログイン後のみ）
                     const accountIcon = document.getElementById('account-icon');
                     const accountModal = document.getElementById('account-modal');
@@ -157,6 +161,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 header.style.display = 'none';
             }
         });
+    }
+
+    async function showAdminLink() {
+      try {
+        const res = await apiFetch("/me");
+        const data = await res.json();
+        if (data.success && data.user && data.user.is_admin) {
+          const nav = document.getElementById("navLinks");
+          if (nav && !document.getElementById("adminLink")) {
+            const a = document.createElement("a");
+            a.href = "admin.html";
+            a.id = "adminLink";
+            a.textContent = "管理者ダッシュボード";
+            a.style.marginLeft = "16px";
+            nav.appendChild(a);
+          }
+        }
+      } catch (err) {
+        console.error("管理者リンク取得エラー:", err);
+      }
     }
 
     // ログイン
@@ -540,4 +564,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- 自動ログイン判定（ページロード時） ---
     checkLogin();
+
 });
